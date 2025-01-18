@@ -94,6 +94,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function checkCombination() {
         const zone1Element = document.querySelector('#dropZone1 .element');
         const zone2Element = document.querySelector('#dropZone2 .element');
+
+        console.log("I am at main combination")
+        console.log(zone1Element)
+        console.log(zone2Element)
     
         if (zone1Element && zone2Element) {
             const element1 = zone1Element.dataset.element;

@@ -1,10 +1,10 @@
-const pool = require('../services/db');
+import pool from '../services/db';
 
 class CombinationManager {
     constructor() {
         this.combinations = new Map();
         this.elements = new Set(['Water', 'Fire', 'Earth', 'Air']);
-        
+
         // Initialize basic combinations
         this.addCombination('Water', 'Earth', 'Mud');
         this.addCombination('Fire', 'Earth', 'Lava');
@@ -68,20 +68,18 @@ class CombinationManager {
         }
     }
 
-    async askAIforResults(first_word, second_word) {
-         const {element1, element2} = req.body;
-        //  const element1 = first_word;
-        //  const element2 = second_word;
-         console.log("I am at AI")
-        
+    async askAIforResults(req, res) {
+        const { element1, element2 } = req.body;
+        console.log("I am at AI");
+
         if (!element1 || !element2) {
             return res.status(400).json({
                 success: false,
                 result: null,
-                error: 'Missing elements'
+                error: 'Missing elements',
             });
         }
-    
+
         try {
             // First get the word combination
             const wordCompletion = await openai.chat.completions.create({
@@ -100,46 +98,46 @@ class CombinationManager {
                     Never reply with im sorry there it can be the most random thing ever that might slightly make sense. the word generated should be easy enough to understand and not be too abstract. A 15 year old should understand`
                 }, {
                     role: "user",
-                    content: `Reply with the result of what would happen if you combine ${element1} and ${element2}. The answer has to be related to both words and the context of the words and may not contain the words themselves.`
+                    content: `Reply with the result of what would happen if you combine ${element1} and ${element2}. The answer has to be related to both words and the context of the words and may not contain the words themselves.`,
                 }],
                 temperature: 0.7,
-                max_tokens: 50
+                max_tokens: 50,
             });
-    
+
             const word = wordCompletion.choices[0].message.content.trim().split(/\s+/)[0];
-    
+
             // Then get the emoji for that word
             const emojiCompletion = await openai.chat.completions.create({
                 model: "gpt-4o",
                 messages: [{
                     role: "system",
-                    content: 'Reply with one emoji the word. Use the UTF-8 encoding.'
+                    content: 'Reply with one emoji the word. Use the UTF-8 encoding.',
                 }, {
                     role: "user",
-                    content: `Give one emoji for: ${word}`
+                    content: `Give one emoji for: ${word}`,
                 }],
                 temperature: 0.7,
-                max_tokens: 50
+                max_tokens: 50,
             });
-    
+
             const emoji = emojiCompletion.choices[0].message.content.trim();
-    
-            res.json({ 
-                success: true, 
+
+            res.json({
+                success: true,
                 result: word,
-                emoji: emoji
+                emoji: emoji,
             });
-    
+
         } catch (error) {
             console.error('API Error:', error);
             res.status(500).json({
                 success: false,
                 result: `${element1}${element2}`,
                 emoji: '❓',
-                error: error.message
+                error: error.message,
             });
         }
-    };
+    }
 }
 
-module.exports = CombinationManager;
+export default CombinationManager;
