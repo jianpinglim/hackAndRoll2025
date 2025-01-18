@@ -3,10 +3,40 @@
 <head>
     <!-- ...existing head... -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <script src="/js/supabase-config.js"></script>
+    <script src="../config/supabase-config.js"></script>
 </head>
 <body>
-    <!-- ...existing HTML... -->
+    <div class="container">
+        <div class="room-controls" id="roomControls">
+            <button onclick="createRoom()" class="btn">Create Room</button>
+            <button onclick="showJoinModal()" class="btn">Join Room</button>
+        </div>
+
+        <!-- Room Code Modal -->
+        <div id="roomCodeModal" class="modal">
+            <div class="modal-content">
+                <h2>Room Created!</h2>
+                <p>Share this code with your friend:</p>
+                <div id="roomCodeDisplay" class="room-code"></div>
+                <p>Waiting for player to join...</p>
+            </div>
+        </div>
+
+        <!-- Join Room Modal -->
+        <div id="joinModal" class="modal">
+            <div class="modal-content">
+                <h2>Join Room</h2>
+                <input type="text" id="roomCodeInput" placeholder="Enter room code" maxlength="4">
+                <button onclick="joinRoom()" class="btn">Join</button>
+                <button onclick="closeModal('joinModal')" class="btn">Cancel</button>
+            </div>
+        </div>
+
+        <!-- Existing content -->
+        <div id="craftingPhase" style="display: none;">
+            <!-- ...existing crafting phase content... -->
+        </div>
+    </div>
     
     <script>
         let currentRoomCode = null;
