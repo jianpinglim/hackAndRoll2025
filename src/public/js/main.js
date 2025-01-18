@@ -63,14 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
         ['Air', '💨']
     ]);
 
-    const basicElements = [
-        { name: 'Water', emoji: '💧' },
-        { name: 'Fire', emoji: '🔥' },
-        { name: 'Earth', emoji: '🌍' },
-        { name: 'Air', emoji: '💨' }
-    ];
-
-
     function handleDragStart(e) {
         e.dataTransfer.setData('text/plain', e.target.dataset.element);
         e.target.classList.add('dragging');
