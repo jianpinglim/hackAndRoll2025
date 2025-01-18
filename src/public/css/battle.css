@@ -1,27 +1,180 @@
-.battle-container {
-    height: 100vh;
-    display: grid;
-    grid-template-rows: 60% 10% 30%;
+@keyframes winnerGlow {
+    0%, 100% {
+        box-shadow: 0 0 30px #ffd700,
+                    0 0 60px #ffd700,
+                    0 0 90px #ffd700;
+    }
+    50% {
+        box-shadow: 0 0 60px #ffd700,
+                    0 0 120px #ffd700,
+                    0 0 180px #ffd700;
+    }
 }
 
-.elements-scroll {
-    overflow-x: auto;
-    padding: 1rem;
-    background: #f8f9fa;
-    border-top: 1px solid #dee2e6;
+/* Container Layout */
+.container {
+    display: grid;
+    grid-template-columns: 70% 30%;
+    height: 100vh;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+}
+
+/* Battle Panel */
+.battle-panel {
+    padding: 2rem;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: calc(100vh - 80px); /* Reduce height to make room for button */
+    position: fixed;
+    width: 70%;
+}
+
+
+.battle-arena {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    padding: 4rem 2rem;
+}
+
+/* Element Positioning */
+.opponent-element {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.player-element {
+    position: absolute;
+    bottom: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Battle Text and Results */
+.vs, .battle-result {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    width: auto;
+    max-width: 80%;
+}
+
+.battle-result {
+    color: #ff4444;
+    font-size: .8rem;
+    white-space: normal;
+    width: 80%;
+    margin-left: 5px;
+}
+
+.vs {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #ff4444;
+    transition: opacity 0.3s;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.vs.hidden {
+    opacity: 0;
+}
+
+/* Elements Panel */
+.elements-panel {
+    background: #fff;
+    border-left: 1px solid #ddd;
+    height: 100vh;
+    position: fixed;
+    right: 0;
+    width: 30%;
+    overflow-y: auto;
 }
 
 .elements-container {
+    padding: 1rem;
     display: flex;
-    gap: 1rem;
-    padding: 0.5rem;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
+/* Element Styling */
 .element {
-    padding: 0.6rem 0.8rem;
+    padding: 1rem 2rem;
+    background: #e9ecef;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    min-width: 200px;
+    text-align: center;
+    margin: 0.5rem 0;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.element:hover {
+    transform: translateY(-2px);
+    background: #dee2e6;
+}
+
+/* Ensure no body/html overflow */
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100vh;
+}
+
+.mode-selection {
+    position: fixed;
+    top: 20px;
+    left: 35%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 1rem;
+    z-index: 1000;
+}
+
+.mode-btn {
+    padding: 0.8rem 1.5rem;
     background: #e9ecef;
     border: 2px solid #dee2e6;
     border-radius: 4px;
     cursor: pointer;
-    white-space: nowrap;
+    font-weight: bold;
+    transition: all 0.3s ease;
 }
+
+.mode-btn:hover {
+    background: #dee2e6;
+    transform: translateY(-2px);
+}
+
+.mode-btn.active {
+    background: #4CAF50;
+    color: white;
+    border-color: #45a049;
+}
+
+.mode-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
