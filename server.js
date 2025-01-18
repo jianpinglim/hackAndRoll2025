@@ -98,7 +98,7 @@ app.post('/api/battle', async (req, res) => {
             model: "gpt-3.5-turbo",
             messages: [{
                 role: "system",
-                content: `You are a funny battle commentator. Generate a humorous battle result between two elements and provide a creative, witty reason for the winner. Keep it light and entertaining.`
+                content: `You are a funny battle commentator. Generate a humorous battle result between two elements and provide a creative, witty reason for the winner. Keep it dark, slightly sexual and abit racist`
             }, {
                 role: "user",
                 content: `Who would win in a battle between ${playerElement} and ${opponentElement}? Provide the winner and a funny reason in a brief response.`
