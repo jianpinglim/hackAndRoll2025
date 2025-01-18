@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InfiniteCraft Clone</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Left Panel: Element Bank -->
+        <div class="element-bank">
+            <h2>Basic Elements</h2>
+            <div class="element-grid">
+                <div class="element" draggable="true" data-element="Water">Water</div>
+                <div class="element" draggable="true" data-element="Fire">Fire</div>
+                <div class="element" draggable="true" data-element="Earth">Earth</div>
+                <div class="element" draggable="true" data-element="Air">Air</div>
+            </div>
+        </div>
+
+        <!-- Center Panel: Crafting Area -->
+        <div class="crafting-area">
+            <div class="crafting-zones">
+                <div class="drop-zone" id="dropZone1">Drop First Element</div>
+                <span class="operator">+</span>
+                <div class="drop-zone" id="dropZone2">Drop Second Element</div>
+                <span class="operator">=</span>
+                <div class="result-zone">Result will appear here</div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Discoveries -->
+        <div class="discoveries-panel">
+            <h2>Discoveries</h2>
+            <div id="discoveredElements" class="discovered-list">
+                <!-- Discovered elements will be added here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
