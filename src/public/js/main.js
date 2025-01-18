@@ -1,14 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
-
-    let timeLeft = 30;
+    // DOM Elements
+    const elements = document.querySelectorAll('.element');
+    const dropZones = document.querySelectorAll('.drop-zone');
+    const resultZone = document.querySelector('.result-zone');
+    const discoveredList = document.getElementById('discoveredElements');
     const countdownEl = document.getElementById('countdown');
 
-    // Timer function
+    // Timer setup
+    let timeLeft = 30;
     function startTimer() {
         const timer = setInterval(() => {
             timeLeft--;
             countdownEl.textContent = timeLeft;
-            
             if (timeLeft <= 0) {
                 clearInterval(timer);
                 window.location.href = 'battle.html';
@@ -16,53 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1000);
     }
 
-    function initializeStorage() {
-        let savedElements = JSON.parse(localStorage.getItem('craftedElements')) || [];
-        
-        // Add basic elements if not present
-        basicElements.forEach(({name, emoji}) => {
-            if (!savedElements.some(el => el.name === name)) {
-                savedElements.push({ name, emoji });
-            }
-        });
-        
-        localStorage.setItem('craftedElements', JSON.stringify(savedElements));
-        return savedElements;
-    }
-
-    function saveToLocalStorage(element, emoji) {
-        let savedElements = JSON.parse(localStorage.getItem('craftedElements')) || [];
-        // Check for duplicates
-        if (!savedElements.some(el => el.name === element)) {
-            savedElements.push({ name: element, emoji: emoji });
-            localStorage.setItem('craftedElements', JSON.stringify(savedElements));
-        }
-    }
-
-    
-
-    // Start timer immediately
-    startTimer();
-    // DOM Elements
-    const elements = document.querySelectorAll('.element');
-    const dropZones = document.querySelectorAll('.drop-zone');
-    const resultZone = document.querySelector('.result-zone');
-    const discoveredList = document.getElementById('discoveredElements');
-
-    // Validate required elements
-    if (!discoveredList) {
-        console.error('Could not find discoveredElements container');
-        return;
-    }
-
-    // Track discovered elements with emojis
-    const discoveries = new Map([
-        ['Water', '💧'],
-        ['Fire', '🔥'],
-        ['Earth', '🌍'],
-        ['Air', '💨']
-    ]);
-
+    // Basic elements
     const basicElements = [
         { name: 'Water', emoji: '💧' },
         { name: 'Fire', emoji: '🔥' },
@@ -70,6 +27,39 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: 'Air', emoji: '💨' }
     ];
 
+    // Initialize discoveries Map
+    const discoveries = new Map(
+        basicElements.map(el => [el.name, el.emoji])
+    );
+
+    function initializeStorage() {
+        let savedElements = JSON.parse(localStorage.getItem('craftedElements')) || [];
+        if (savedElements.length === 0) {
+            savedElements = basicElements;
+            localStorage.setItem('craftedElements', JSON.stringify(savedElements));
+        }
+        return savedElements;
+    }
+
+    function saveToLocalStorage(element, emoji) {
+        let savedElements = JSON.parse(localStorage.getItem('craftedElements')) || [];
+        if (!savedElements.some(el => el.name === element)) {
+            savedElements.push({ name: element, emoji });
+            localStorage.setItem('craftedElements', JSON.stringify(savedElements));
+        }
+    }
+
+    function createElementDiv(name, emoji = '❓') {
+        const div = document.createElement('div');
+        div.className = 'element';
+        div.innerHTML = `<span class="emoji">${emoji}</span> <span class="name">${name}</span>`;
+        div.dataset.element = name;
+        div.dataset.emoji = emoji;
+        div.draggable = true;
+        div.addEventListener('dragstart', handleDragStart);
+        div.addEventListener('dragend', handleDragEnd);
+        return div;
+    }
 
     function handleDragStart(e) {
         e.dataTransfer.setData('text/plain', e.target.dataset.element);
@@ -104,18 +94,6 @@ document.addEventListener('DOMContentLoaded', () => {
         checkCombination();
     }
 
-    function createElementDiv(name, emoji = '❓') {
-        const div = document.createElement('div');
-        div.className = 'element';
-        div.innerHTML = `<span class="emoji">${emoji}</span> <span class="name">${name}</span>`;
-        div.dataset.element = name;
-        div.dataset.emoji = emoji;
-        div.draggable = true;
-        div.addEventListener('dragstart', handleDragStart);
-        div.addEventListener('dragend', handleDragEnd);
-        return div;
-    }
-
     function clearCraftingArea() {
         const zone1 = document.querySelector('#dropZone1');
         const zone2 = document.querySelector('#dropZone2');
@@ -128,15 +106,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const zone1Element = document.querySelector('#dropZone1 .element');
         const zone2Element = document.querySelector('#dropZone2 .element');
 
-        console.log("I am at main combination")
-        console.log(zone1Element)
-        console.log(zone2Element)
-    
         if (zone1Element && zone2Element) {
             const element1 = zone1Element.dataset.element;
             const element2 = zone2Element.dataset.element;
             console.log('Combining:', element1, element2);
-    
+
             fetch('/api/combinations/combine', {
                 method: 'POST',
                 headers: {
@@ -154,9 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .catch(error => {
                 console.error('API Error:', error);
-                const fallback = `${element1}${element2}`;
-                console.warn('Using simple combination:', fallback);
-                displayResult(fallback, '❓');
+                displayResult(`${element1}${element2}`, '❓');
                 clearCraftingArea();
             });
         }
@@ -174,19 +146,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    const savedElements = initializeStorage();
-    savedElements.forEach(({name, emoji}) => {
-        discoveries.set(name, emoji);
-        updateDiscoveries(name, emoji);
-    });
-
-
-    function saveToLocalStorage(element, emoji) {
-        let savedElements = JSON.parse(localStorage.getItem('craftedElements')) || [];
-        savedElements.push({ name: element, emoji: emoji });
-        localStorage.setItem('craftedElements', JSON.stringify(savedElements));
-    }
-
     function updateDiscoveries(newElement, emoji) {
         const discoveryDiv = createElementDiv(newElement, emoji);
         discoveryDiv.classList.add('new-discovery');
@@ -200,10 +159,12 @@ document.addEventListener('DOMContentLoaded', () => {
         zone.addEventListener('drop', handleDrop);
     });
 
-    // Initialize discovered elements
-    discoveries.forEach((emoji, element) => {
-        updateDiscoveries(element, emoji);
+    // Initialize everything
+    startTimer();
+    discoveredList.innerHTML = ''; // Clear existing
+    const savedElements = initializeStorage();
+    savedElements.forEach(({name, emoji}) => {
+        discoveries.set(name, emoji);
+        updateDiscoveries(name, emoji);
     });
 });
-
-
