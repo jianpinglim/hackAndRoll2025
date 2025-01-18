@@ -1,0 +1,27 @@
+.battle-container {
+    height: 100vh;
+    display: grid;
+    grid-template-rows: 60% 10% 30%;
+}
+
+.elements-scroll {
+    overflow-x: auto;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+}
+
+.elements-container {
+    display: flex;
+    gap: 1rem;
+    padding: 0.5rem;
+}
+
+.element {
+    padding: 0.6rem 0.8rem;
+    background: #e9ecef;
+    border: 2px solid #dee2e6;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+}

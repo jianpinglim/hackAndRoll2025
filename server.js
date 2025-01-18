@@ -148,6 +148,36 @@ app.post('/api/combinations/combine',
     }
 );
 
+app.post('/api/battle', async (req, res) => {
+    const { playerElement, opponentElement } = req.body;
+
+    try {
+        const completion = await openai.chat.completions.create({
+            model: "gpt-3.5-turbo",
+            messages: [{
+                role: "system",
+                content: `You are a funny battle commentator. Generate a humorous battle result between two elements and provide a creative, witty reason for the winner. Keep it light and entertaining.`
+            }, {
+                role: "user",
+                content: `Who would win in a battle between ${playerElement} and ${opponentElement}? Provide the winner and a funny reason in a brief response.`
+            }],
+            temperature: 0.8,
+            max_tokens: 100
+        });
+
+        const response = completion.choices[0].message.content;
+        const [winner, ...reasonParts] = response.split(':');
+        
+        res.json({
+            winner: winner.trim(),
+            reason: reasonParts.join(':').trim()
+        });
+    } catch (error) {
+        console.error('Battle API Error:', error);
+        res.status(500).json({ error: 'Battle calculation failed' });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
