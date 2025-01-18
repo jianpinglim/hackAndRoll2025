@@ -7,25 +7,34 @@
     <link rel="stylesheet" href="css/battle.css">
 </head>
 <body>
-    <div class="battle-container">
-        <!-- Battle Arena -->
-        <div class="battle-arena">
-            <div class="player-element">
-                <div class="element-placeholder">Select your element</div>
-            </div>
-            <div class="vs">VS</div>
-            <div class="opponent-element">
-                <div class="element">🪨 Stone</div>
-            </div>
-        </div>
+    <div class="container">
+        <div class="mode-selection">
+            <button class="mode-btn" data-mode="funny">Funny Mode</button>
+            <button class="mode-btn" data-mode="brainrot">Brainrot Mode</button>
+            <button class="mode-btn" data-mode="racist">Racist Mode</button>
+            <button class="mode-btn" onclick="window.location.href='index.html'">Back to Crafting</button>
 
-        <!-- Battle Result -->
-        <div class="battle-result"></div>
-
-        <!-- Element Selection -->
-        <div class="elements-scroll">
-            <div id="savedElements" class="elements-container"></div>
         </div>
+        <!-- Left Panel: Battle Arena -->
+        <section class="battle-panel">
+            <div class="battle-arena">
+                <div class="player-element">
+                    <div class="element-placeholder">Select your element</div>
+                </div>
+                <div class="vs">VS</div>
+                <div class="opponent-element">
+                    <div class="element">🪨 Stone</div>
+                </div>
+            </div>
+            <div class="battle-result"></div>
+        </section>
+
+        <!-- Right Panel: Elements Library -->
+        <section class="elements-panel">
+            <div class="elements-container">
+                <div id="savedElements"></div>
+            </div>
+        </section>
     </div>
     <script src="js/battle.js"></script>
 </body>

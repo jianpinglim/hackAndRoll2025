@@ -156,17 +156,23 @@ app.post('/api/combinations/combine',
 );
 
 app.post('/api/battle', async (req, res) => {
-    const { playerElement, opponentElement } = req.body;
+    const { playerElement, opponentElement, mode } = req.body;
+
+    const prompts = {
+        funny: "You are a funny battle commentator. Generate a humorous battle result with silly puns and jokes. Keep it light and family-friendly.",
+        brainrot: "You are a chaotic battle commentator. Generate absolutely nonsensical battle results with random internet memes and absurd logic and brainrot.",
+        racist: "You are an Racist against asians battle commentator. Generate dark humor battle results with controversial stereotypes against asians and edgy jokes."
+    };
 
     try {
         const completion = await openai.chat.completions.create({
             model: "gpt-3.5-turbo",
             messages: [{
                 role: "system",
-                content: `You are a funny battle commentator. Generate a humorous battle result between two elements and provide a creative, witty reason for the winner. Keep it dark, slightly sexual and abit racist`
+                content: prompts[mode] || prompts.funny
             }, {
                 role: "user",
-                content: `Who would win in a battle between ${playerElement} and ${opponentElement}? Provide the winner and a funny reason in a brief response.`
+                content: `Who would win in a battle between ${playerElement} and ${opponentElement}? Provide the winner and a reason in 2 lines max.`
             }],
             temperature: 0.8,
             max_tokens: 100
