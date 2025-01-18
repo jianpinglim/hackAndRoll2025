@@ -9,6 +9,7 @@ const combinationController = {
         const result = combinationManager.getCombination(element1, element2);
         
         if (result) {
+            
             res.json({ success: true, result: new Element(result, 'combined') });
         } else {
             const newResult = `${element1}${element2}`;
