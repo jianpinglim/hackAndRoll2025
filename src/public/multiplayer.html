@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ...existing head... -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="/js/supabase-config.js"></script>
+</head>
+<body>
+    <!-- ...existing HTML... -->
+    
+    <script>
+        let currentRoomCode = null;
+        let gamePhase = 'waiting';
+        let craftingTimer = null;
+        let selectedChampion = null;
+        let roomSubscription = null;
+
+        async function createRoom() {
+            const roomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
+            
+            const { data, error } = await supabase
+                .from('rooms')
+                .insert([
+                    { 
+                        code: roomCode,
+                        status: 'waiting',
+                        player_count: 1
+                    }
+                ]);
+
+            if (error) {
+                console.error('Error creating room:', error);
+                return;
+            }
+
+            currentRoomCode = roomCode;
+            document.getElementById('roomCodeDisplay').textContent = roomCode;
+            document.getElementById('roomCodeModal').style.display = 'block';
+            
+            subscribeToRoom(roomCode);
+        }
+
+        async function joinRoom() {
+            const roomCode = document.getElementById('roomCodeInput').value.toUpperCase();
+            
+            const { data, error } = await supabase
+                .from('rooms')
+                .update({ player_count: 2, status: 'full' })
+                .eq('code', roomCode)
+                .single();
+
+            if (error) {
+                alert('Invalid room code or room is full');
+                return;
+            }
+
+            currentRoomCode = roomCode;
+            closeModal('joinModal');
+            subscribeToRoom(roomCode);
+        }
+
+        function subscribeToRoom(roomCode) {
+            roomSubscription = supabase
+                .channel(`room:${roomCode}`)
+                .on('postgres_changes', {
+                    event: '*',
+                    schema: 'public',
+                    table: 'rooms',
+                    filter: `code=eq.${roomCode}`
+                }, handleRoomUpdate)
+                .subscribe();
+        }
+
+        function handleRoomUpdate(payload) {
+            const { new: newRoom } = payload;
+            
+            if (newRoom.status === 'full' && newRoom.player_count === 2) {
+                closeModal('roomCodeModal');
+                startCraftingPhase();
+            }
+            
+            if (newRoom.status === 'crafting_complete') {
+                startBattlePhase();
+            }
+
+            if (newRoom.status === 'battle_complete') {
+                handleBattleComplete(newRoom.battle_result);
+            }
+        }
+
+        async function selectChampion(championId) {
+            if (selectedChampion === championId) return;
+            
+            selectedChampion = championId;
+            document.querySelectorAll('.champion').forEach(el => {
+                el.classList.remove('selected');
+            });
+            document.querySelector(`[data-champion-id="${championId}"]`).classList.add('selected');
+            
+            const { error } = await supabase
+                .from('game_states')
+                .upsert({
+                    room_code: currentRoomCode,
+                    champion_id: championId
+                });
+        }
+
+        function startCraftingPhase() {
+            gamePhase = 'crafting';
+            document.getElementById('roomControls').style.display = 'none';
+            document.getElementById('craftingPhase').style.display = 'block';
+            startCraftingTimer();
+        }
+
+        async function craftingComplete() {
+            const { error } = await supabase
+                .from('rooms')
+                .update({ status: 'crafting_complete' })
+                .eq('code', currentRoomCode);
+        }
+
+        // ...existing timer and utility functions...
+
+        // Cleanup function
+        window.addEventListener('beforeunload', () => {
+            if (roomSubscription) {
+                roomSubscription.unsubscribe();
+            }
+        });
+    </script>
+</body>
+</html>
