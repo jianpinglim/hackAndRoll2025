@@ -1,3 +1,5 @@
+
+
 document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
     const elements = document.querySelectorAll('.element');
@@ -135,3 +137,5 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDiscoveries(element, emoji);
     });
 });
+
+
