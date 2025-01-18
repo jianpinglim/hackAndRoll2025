@@ -1,6 +1,23 @@
-
-
 document.addEventListener('DOMContentLoaded', () => {
+
+    let timeLeft = 30;
+    const countdownEl = document.getElementById('countdown');
+
+    // Timer function
+    function startTimer() {
+        const timer = setInterval(() => {
+            timeLeft--;
+            countdownEl.textContent = timeLeft;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                window.location.href = 'battle.html';
+            }
+        }, 1000);
+    }
+
+    // Start timer immediately
+    startTimer();
     // DOM Elements
     const elements = document.querySelectorAll('.element');
     const dropZones = document.querySelectorAll('.drop-zone');
@@ -116,7 +133,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!discoveries.has(result)) {
             discoveries.set(result, emoji);
             updateDiscoveries(result, emoji);
+            // Save to localStorage
+            saveToLocalStorage(result, emoji);
         }
+    }
+
+    function saveToLocalStorage(element, emoji) {
+        let savedElements = JSON.parse(localStorage.getItem('craftedElements')) || [];
+        savedElements.push({ name: element, emoji: emoji });
+        localStorage.setItem('craftedElements', JSON.stringify(savedElements));
     }
 
     function updateDiscoveries(newElement, emoji) {

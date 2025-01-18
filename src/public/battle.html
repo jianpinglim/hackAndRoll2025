@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Element Battle</title>
+    <link rel="stylesheet" href="css/battle.css">
+</head>
+<body>
+    <div class="battle-container">
+        <!-- Battle Arena -->
+        <div class="battle-arena">
+            <div class="player-element">
+                <div class="element-placeholder">Select your element</div>
+            </div>
+            <div class="vs">VS</div>
+            <div class="opponent-element">
+                <div class="element">🪨 Stone</div>
+            </div>
+        </div>
+
+        <!-- Battle Result -->
+        <div class="battle-result"></div>
+
+        <!-- Element Selection -->
+        <div class="elements-scroll">
+            <div id="savedElements" class="elements-container"></div>
+        </div>
+    </div>
+    <script src="js/battle.js"></script>
+</body>
+</html>
