@@ -5,6 +5,9 @@ import { dirname } from 'path';
 import dotenv from 'dotenv';
 import OpenAI from 'openai';
 import pool from'./db.js';
+import { createServer } from 'http';
+const app = express();
+
 
 dotenv.config();
 
@@ -15,7 +18,6 @@ const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY
 });
 
-const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
@@ -148,9 +150,25 @@ app.post('/api/combinations/combine',
     }
 );
 
-app.post('/api/battle', async (req, res) => {
-    const { playerElement, opponentElement, mode } = req.body;
+app.post('/api/battle', async (req, res, next) => {
+    
+        try {
+            const { rows } = await pool.query(
+            'SELECT result, emoji FROM your_table_name ORDER BY RANDOM() LIMIT 1'
+            )
+            res.locals.opponent = rows[0]
+            next()
+        } catch (err) {
+            console.error('Error getting random row:', err)
+            throw err
+        }
 
+}, async (req, res) => {
+    const { playerElement, mode } = req.body;
+    const { opponentElement} = res.locals.opponent;
+    console.log(opponentElement)
+
+    
     const prompts = {
         funny: "You are a funny battle commentator. Generate a humorous battle result with silly puns and jokes. Keep it light and family-friendly.",
         brainrot: "You are a chaotic battle commentator. Generate absolutely nonsensical battle results with random internet memes and absurd logic and brainrot.",
@@ -183,6 +201,16 @@ app.post('/api/battle', async (req, res) => {
         res.status(500).json({ error: 'Battle calculation failed' });
     }
 });
+
+// Serve static files
+app.use(express.static('public'));
+
+// Game state
+const rooms = new Map();
+
+
+
+
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
