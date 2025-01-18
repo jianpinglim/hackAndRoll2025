@@ -16,6 +16,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1000);
     }
 
+    function initializeLocalStorage() {
+        let savedElements = JSON.parse(localStorage.getItem('craftedElements')) || [];
+        
+        // Add basic elements if not already present
+        basicElements.forEach(({name, emoji}) => {
+            if (!savedElements.some(el => el.name === name)) {
+                savedElements.push({ name, emoji });
+            }
+        });
+        
+        localStorage.setItem('craftedElements', JSON.stringify(savedElements));
+    }
+
+    function saveToLocalStorage(element, emoji) {
+        let savedElements = JSON.parse(localStorage.getItem('craftedElements')) || [];
+        if (!savedElements.some(el => el.name === element)) {
+            savedElements.push({ name: element, emoji: emoji });
+            localStorage.setItem('craftedElements', JSON.stringify(savedElements));
+        }
+    }
+
+    
+
     // Start timer immediately
     startTimer();
     // DOM Elements
@@ -137,10 +160,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!discoveries.has(result)) {
             discoveries.set(result, emoji);
             updateDiscoveries(result, emoji);
-            // Save to localStorage
             saveToLocalStorage(result, emoji);
         }
     }
+
+    initializeLocalStorage();
+
 
     function saveToLocalStorage(element, emoji) {
         let savedElements = JSON.parse(localStorage.getItem('craftedElements')) || [];
