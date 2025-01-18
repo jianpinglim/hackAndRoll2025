@@ -16,10 +16,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1000);
     }
 
-    function initializeLocalStorage() {
+    function initializeStorage() {
         let savedElements = JSON.parse(localStorage.getItem('craftedElements')) || [];
         
-        // Add basic elements if not already present
+        // Add basic elements if not present
         basicElements.forEach(({name, emoji}) => {
             if (!savedElements.some(el => el.name === name)) {
                 savedElements.push({ name, emoji });
@@ -27,10 +27,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         localStorage.setItem('craftedElements', JSON.stringify(savedElements));
+        return savedElements;
     }
 
     function saveToLocalStorage(element, emoji) {
         let savedElements = JSON.parse(localStorage.getItem('craftedElements')) || [];
+        // Check for duplicates
         if (!savedElements.some(el => el.name === element)) {
             savedElements.push({ name: element, emoji: emoji });
             localStorage.setItem('craftedElements', JSON.stringify(savedElements));
@@ -172,7 +174,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    initializeLocalStorage();
+    const savedElements = initializeStorage();
+    savedElements.forEach(({name, emoji}) => {
+        discoveries.set(name, emoji);
+        updateDiscoveries(name, emoji);
+    });
 
 
     function saveToLocalStorage(element, emoji) {
