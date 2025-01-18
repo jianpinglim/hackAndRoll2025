@@ -11,20 +11,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Track discovered elements
-    const discoveries = new Set(['Water', 'Fire', 'Earth', 'Air']);
-
-    // Add drag and drop listeners
-    elements.forEach(element => {
-        element.addEventListener('dragstart', handleDragStart);
-        element.addEventListener('dragend', handleDragEnd);
-    });
-
-    dropZones.forEach(zone => {
-        zone.addEventListener('dragover', handleDragOver);
-        zone.addEventListener('dragleave', handleDragLeave);
-        zone.addEventListener('drop', handleDrop);
-    });
+    // Track discovered elements with emojis
+    const discoveries = new Map([
+        ['Water', '💧'],
+        ['Fire', '🔥'],
+        ['Earth', '🌍'],
+        ['Air', '💨']
+    ]);
 
     function handleDragStart(e) {
         e.dataTransfer.setData('text/plain', e.target.dataset.element);
@@ -50,7 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
         zone.classList.remove('drag-over');
         
         const elementName = e.dataTransfer.getData('text/plain');
-        const newElement = createElementDiv(elementName);
+        const elementEmoji = discoveries.get(elementName) || '❓';
+        const newElement = createElementDiv(elementName, elementEmoji);
         
         zone.innerHTML = '';
         zone.appendChild(newElement);
@@ -58,15 +52,24 @@ document.addEventListener('DOMContentLoaded', () => {
         checkCombination();
     }
 
-    function createElementDiv(name) {
+    function createElementDiv(name, emoji = '❓') {
         const div = document.createElement('div');
         div.className = 'element';
-        div.textContent = name;
+        div.innerHTML = `<span class="emoji">${emoji}</span> <span class="name">${name}</span>`;
         div.dataset.element = name;
+        div.dataset.emoji = emoji;
         div.draggable = true;
         div.addEventListener('dragstart', handleDragStart);
         div.addEventListener('dragend', handleDragEnd);
         return div;
+    }
+
+    function clearCraftingArea() {
+        const zone1 = document.querySelector('#dropZone1');
+        const zone2 = document.querySelector('#dropZone2');
+        
+        zone1.innerHTML = 'Drag Element Here';
+        zone2.innerHTML = 'Drag Element Here';
     }
 
     function checkCombination() {
@@ -77,8 +80,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const element1 = zone1Element.dataset.element;
             const element2 = zone2Element.dataset.element;
             console.log('Combining:', element1, element2);
-    
-            resultZone.textContent = 'Thinking...';
     
             fetch('/api/combinations/combine', {
                 method: 'POST',
@@ -92,36 +93,45 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!data.success) {
                     console.warn('Using fallback combination:', data.error);
                 }
-                displayResult(data.result);
+                displayResult(data.result, data.emoji);
+                clearCraftingArea();
             })
             .catch(error => {
                 console.error('API Error:', error);
                 const fallback = `${element1}${element2}`;
                 console.warn('Using simple combination:', fallback);
-                displayResult(fallback);
+                displayResult(fallback, '❓');
+                clearCraftingArea();
             });
         }
     }
 
-    function displayResult(result) {
+    function displayResult(result, emoji) {
         resultZone.innerHTML = '';
-        const resultElement = createElementDiv(result);
+        const resultElement = createElementDiv(result, emoji);
         resultZone.appendChild(resultElement);
         
         if (!discoveries.has(result)) {
-            discoveries.add(result);
-            updateDiscoveries(result);
+            discoveries.set(result, emoji);
+            updateDiscoveries(result, emoji);
         }
     }
 
-    function updateDiscoveries(newElement) {
-        const discoveryDiv = createElementDiv(newElement);
+    function updateDiscoveries(newElement, emoji) {
+        const discoveryDiv = createElementDiv(newElement, emoji);
         discoveryDiv.classList.add('new-discovery');
         discoveredList.appendChild(discoveryDiv);
     }
 
-    // Initialize discovered elements (only once)
-    discoveries.forEach(element => {
-        updateDiscoveries(element);
+    // Add drag and drop listeners
+    dropZones.forEach(zone => {
+        zone.addEventListener('dragover', handleDragOver);
+        zone.addEventListener('dragleave', handleDragLeave);
+        zone.addEventListener('drop', handleDrop);
+    });
+
+    // Initialize discovered elements
+    discoveries.forEach((emoji, element) => {
+        updateDiscoveries(element, emoji);
     });
 });
