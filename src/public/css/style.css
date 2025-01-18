@@ -149,7 +149,28 @@ body {
     width: 200px; /* Fixed width for better centering */
 }
 
+.fight-btn {
+    position: fixed;
+    bottom: 20px;
+    left: 35%;
+    transform: translateX(-50%);
+    padding: 1rem 2rem;
+    background: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
 
+.fight-btn:hover {
+    background: #ff2222;
+    transform: translateX(-50%) translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
 
 #countdown {
     font-weight: bold;

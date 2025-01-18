@@ -6,18 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const discoveredList = document.getElementById('discoveredElements');
     const countdownEl = document.getElementById('countdown');
 
-    // Timer setup
-    let timeLeft = 30;
-    function startTimer() {
-        const timer = setInterval(() => {
-            timeLeft--;
-            countdownEl.textContent = timeLeft;
-            if (timeLeft <= 0) {
-                clearInterval(timer);
-                window.location.href = 'battle.html';
-            }
-        }, 1000);
-    }
 
     // Basic elements
     const basicElements = [
@@ -160,7 +148,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Initialize everything
-    startTimer();
     discoveredList.innerHTML = ''; // Clear existing
     const savedElements = initializeStorage();
     savedElements.forEach(({name, emoji}) => {

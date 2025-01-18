@@ -72,7 +72,7 @@ app.post('/api/combinations/combine',
                     The answer has to be related to both words and the context of the words.
                     The answer can either be a combination of the words or the role of one word in relation to the other.
                     Answers can be things, materials, people, companies, animals, occupations, food, places, objects, emotions, events, concepts, natural phenomena, body parts, vehicles, sports, clothing, furniture, technology, buildings, technology, instruments, beverages, plants, academic subjects and everything else you can think of that is a noun.
-                    Never reply with im sorry there it can be the most random thing ever that might slightly make sense. the word generated should be easy enough to understand and not be too abstract. A 15 year old should understand`
+                    I would mainly focus on an answer where its a character. A 15 year old should understand`
                 }, {
                     role: "user",
                     content: `Reply with the result of what would happen if you combine ${element1} and ${element2}. The answer has to be related to both words and the context of the words and may not contain the words themselves.`
