@@ -55,6 +55,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    // Track discovered elements with emojis
+    const discoveries = new Map([
+        ['Water', '💧'],
+        ['Fire', '🔥'],
+        ['Earth', '🌍'],
+        ['Air', '💨']
+    ]);
 
     const basicElements = [
         { name: 'Water', emoji: '💧' },
