@@ -6,13 +6,8 @@ import dotenv from 'dotenv';
 import OpenAI from 'openai';
 import pool from'./db.js';
 import { createServer } from 'http';
-import { Server } from 'socket.io';
 const app = express();
 
-const httpServer = createServer(app);
-const io = new Server(httpServer);
-
-export { httpServer, io };
 
 dotenv.config();
 
@@ -155,9 +150,25 @@ app.post('/api/combinations/combine',
     }
 );
 
-app.post('/api/battle', async (req, res) => {
-    const { playerElement, opponentElement, mode } = req.body;
+app.post('/api/battle', async (req, res, next) => {
+    
+        try {
+            const { rows } = await pool.query(
+            'SELECT result, emoji FROM your_table_name ORDER BY RANDOM() LIMIT 1'
+            )
+            res.locals.opponent = rows[0]
+            next()
+        } catch (err) {
+            console.error('Error getting random row:', err)
+            throw err
+        }
 
+}, async (req, res) => {
+    const { playerElement, mode } = req.body;
+    const { opponentElement} = res.locals.opponent;
+    console.log(opponentElement)
+
+    
     const prompts = {
         funny: "You are a funny battle commentator. Generate a humorous battle result with silly puns and jokes. Keep it light and family-friendly.",
         brainrot: "You are a chaotic battle commentator. Generate absolutely nonsensical battle results with random internet memes and absurd logic and brainrot.",
@@ -191,137 +202,15 @@ app.post('/api/battle', async (req, res) => {
     }
 });
 
-io.on('connection', (socket) => {
-    console.log('User connected:', socket.id);
-
-    // Handle room creation
-    socket.on('createRoom', () => {
-        let roomCode;
-        do {
-            roomCode = generateRoomCode();
-        } while (rooms.has(roomCode));
-
-        rooms.set(roomCode, {
-            players: [socket.id],
-            selections: {}
-        });
-
-        socket.join(roomCode);
-        socket.emit('roomCreated', { roomCode });
-    });
-
-    // Handle room joining
-    socket.on('joinRoom', (roomCode) => {
-        const room = rooms.get(roomCode);
-        
-        if (!room) {
-            socket.emit('joinError', { message: 'Room not found!' });
-            return;
-        }
-
-        if (room.players.length >= 2) {
-            socket.emit('joinError', { message: 'Room is full!' });
-            return;
-        }
-
-        room.players.push(socket.id);
-        socket.join(roomCode);
-
-        // Send champions list to both players and start game
-        io.to(roomCode).emit('championList', champions);
-        io.to(roomCode).emit('gameStart', { roomCode });
-    });
-});
-
 // Serve static files
 app.use(express.static('public'));
 
 // Game state
 const rooms = new Map();
 
-// Generate random room code
-function generateRoomCode() {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let code = '';
-  for (let i = 0; i < 4; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return code;
-}
 
-io.on('connection', (socket) => {
-  console.log('User connected:', socket.id);
 
-  // Handle room creation
-  socket.on('createRoom', () => {
-    let roomCode;
-    do {
-      roomCode = generateRoomCode();
-    } while (rooms.has(roomCode));
 
-    rooms.set(roomCode, {
-      players: [socket.id],
-      selections: {}
-    });
-
-    socket.join(roomCode);
-    socket.emit('roomCreated', { roomCode });
-  });
-
-  // Handle room joining
-  socket.on('joinRoom', (roomCode) => {
-    const room = rooms.get(roomCode);
-    
-    if (!room) {
-      socket.emit('joinError', { message: 'Room not found!' });
-      return;
-    }
-
-    if (room.players.length >= 2) {
-      socket.emit('joinError', { message: 'Room is full!' });
-      return;
-    }
-
-    room.players.push(socket.id);
-    socket.join(roomCode);
-
-    // Send champions list to both players and start game
-    io.to(roomCode).emit('championList', champions);
-    io.to(roomCode).emit('gameStart', { roomCode });
-  });
-
-  // Handle champion selection
-  socket.on('selectChampion', ({ championId, roomCode }) => {
-    const room = rooms.get(roomCode);
-    if (!room) return;
-
-    room.selections[socket.id] = champions.find(c => c.id === championId);
-
-    // If both players have selected, show results
-    if (Object.keys(room.selections).length === 2) {
-        io.to(roomCode).emit('battleResult', {
-            selections: room.selections
-        });
-
-        // Clean up room after battle
-        setTimeout(() => {
-            rooms.delete(roomCode);
-            io.to(roomCode).emit('returnHome');
-        }, 3000);
-    }
-});
-
-  socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
-    // Clean up rooms when players disconnect
-    for (const [roomCode, room] of rooms.entries()) {
-      if (room.players.includes(socket.id)) {
-        rooms.delete(roomCode);
-        io.to(roomCode).emit('playerLeft');
-      }
-    }
-  });
-});
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
