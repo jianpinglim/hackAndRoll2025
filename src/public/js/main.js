@@ -55,13 +55,14 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Track discovered elements with emojis
-    const discoveries = new Map([
-        ['Water', '💧'],
-        ['Fire', '🔥'],
-        ['Earth', '🌍'],
-        ['Air', '💨']
-    ]);
+
+    const basicElements = [
+        { name: 'Water', emoji: '💧' },
+        { name: 'Fire', emoji: '🔥' },
+        { name: 'Earth', emoji: '🌍' },
+        { name: 'Air', emoji: '💨' }
+    ];
+
 
     function handleDragStart(e) {
         e.dataTransfer.setData('text/plain', e.target.dataset.element);
