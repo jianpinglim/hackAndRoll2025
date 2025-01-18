@@ -4,18 +4,25 @@ const CombinationManager = require('../models/combination');
 const combinationManager = new CombinationManager();
 
 const combinationController = {
-    combineElements: async (req, res) => {
+    combineElements: async (req, res, next) => {
         const { element1, element2 } = req.body;
+        const combination = await this.combinationManager.findCombinationInDB(element1, element2);
         const result = combinationManager.getCombination(element1, element2);
         
-        if (result) {
-            
-            res.json({ success: true, result: new Element(result, 'combined') });
+        if (combination) {
+            res.json({ 
+                success: true, 
+                result: combination.result,
+                emoji: combination.emoji
+            });
         } else {
-            const newResult = `${element1}${element2}`;
-            await this.combinationManager.addCombinationToDB(element1, element2, result, emoji);
-            combinationManager.addCombination(element1, element2, newResult);
-            res.json({ success: true, result: new Element(newResult, 'combined') });
+            res.locals.element1 = element1;
+            res.locals.element2 = element2;
+            next();
+            // const newResult = `${element1}${element2}`;
+            // await this.combinationManager.addCombinationToDB(element1, element2, result, emoji);
+            // combinationManager.addCombination(element1, element2, newResult);
+            // res.json({ success: true, result: new Element(newResult, 'combined') });
         }
     },
 
@@ -81,7 +88,16 @@ const combinationController = {
         const { element1, element2 } = req.params;
         const result = combinationManager.getCombination(element1, element2);
         res.json({ exists: !!result, result });
+    },
+
+    queryAI: async (req, res) => {
+        const element1 = res.locals.element1;
+        const element2 = res.locals.element2;
+        const result = await this.combinationManager.askAIforResults(element1, element2);
+        res.json({...result });
     }
+
+
 };
 
 module.exports = combinationController;
