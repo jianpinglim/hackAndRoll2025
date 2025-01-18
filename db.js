@@ -1,6 +1,5 @@
 import dotenv from 'dotenv';
 dotenv.config();
-
 import pkg from 'pg';
 const { Pool } = pkg;
 
@@ -14,4 +13,4 @@ const pool = new Pool({
 });
 
 // Export the pool for reuse in your app
-module.exports = pool;
+export default pool;
