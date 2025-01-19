@@ -85,7 +85,8 @@ body {
 }
 
 .element {
-    padding: 0.6rem 0.8rem;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.8rem;
     background: #e9ecef;
     border: 2px solid #dee2e6;
     border-radius: 4px;
@@ -95,12 +96,10 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 0.9rem;
     margin: 0.2rem 0;
 }
-
 .element .emoji {
-    font-size: 1.2em;
+    font-size: 1em; /* Slightly smaller emoji */
 }
 
 .element .name {
@@ -117,8 +116,8 @@ body {
 }
 
 #discoveredElements {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: 0.5rem;
 }
 
@@ -175,4 +174,10 @@ body {
 #countdown {
     font-weight: bold;
     margin: 0 5px;
+}
+
+#discoveredElements {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Two columns for side-by-side alignment */
+    gap: 0.5rem;
 }
