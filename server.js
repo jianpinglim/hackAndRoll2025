@@ -152,15 +152,12 @@ app.post('/api/combinations/combine',
     }
 );
 
-app.post('/api/battle', async (req, res) => {});
-async (req, res) => {
+app.post('/api/battle', async (req, res) => {
     const { playerElement, opponentElement, mode } = req.body;
-    console.log(playerElement)
 
     const prompts = {
         funny: "You are a funny battle commentator. Generate a humorous battle result with silly puns and jokes. Keep it light and family-friendly.",
         brainrot: "You are a chaotic battle commentator. Generate absolutely nonsensical battle results with random internet memes and absurd logic and brainrot.",
-        racist: "You are an Racist against asians battle commentator. Generate dark humor battle results with controversial stereotypes against asians and edgy jokes."
     };
 
     try {
@@ -183,7 +180,8 @@ async (req, res) => {
         res.json({
             winner: winner.trim(),
             reason: reasonParts.join(':').trim(),
-            playerElement: playerElement
+            playerElement: playerElement,
+            opponentElement: opponentElement
         });
 
     } catch (error) {
