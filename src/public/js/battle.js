@@ -29,10 +29,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function selectElement(name, emoji) {
-        if (!selectedMode) {
-            alert('Please select a battle mode first!');
-            return; // Early return if no mode selected
-        }
+        // if (!selectedMode) {
+        //     alert('Please select a battle mode first!');
+        //     return; // Early return if no mode selected
+        // }
         playerElement.innerHTML = `<div class="element">${emoji} ${name}</div>`;
         startBattle(name);
     }
@@ -67,10 +67,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function startBattle(playerChoice) {
-        if (!selectedMode) {
-            alert('Please select a battle mode first!');
-            return;
-        }
+        // if (!selectedMode) {
+        //     alert('Please select a battle mode first!');
+        //     return;
+        // }
 
         try {
             const vsElement = document.querySelector('.vs');
