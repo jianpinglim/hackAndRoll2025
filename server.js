@@ -154,9 +154,10 @@ app.post('/api/battle', async (req, res, next) => {
     
         try {
             const { rows } = await pool.query(
-            'SELECT result, emoji FROM your_table_name ORDER BY RANDOM() LIMIT 1'
+            'SELECT result, emoji FROM word_cache ORDER BY RANDOM() LIMIT 1'
             )
             res.locals.opponent = rows[0]
+            console.log(res.locals.opponent.result)        
             next()
         } catch (err) {
             console.error('Error getting random row:', err)
@@ -165,8 +166,8 @@ app.post('/api/battle', async (req, res, next) => {
 
 }, async (req, res) => {
     const { playerElement, mode } = req.body;
-    const { opponentElement} = res.locals.opponent;
-    console.log(opponentElement)
+    const  opponentElement = res.locals.opponent.result;
+    console.log(res.locals.opponent.result)
 
     
     const prompts = {
