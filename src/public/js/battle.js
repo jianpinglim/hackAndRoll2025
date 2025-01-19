@@ -70,11 +70,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function updateOpponent(element, emoji) {
-        const opponentEmoji = document.getElementById('opponent-emoji');
-        const opponentResult = document.getElementById('opponent-result');
-    
-        opponentEmoji.textContent = emoji;
-        opponentResult.textContent = element;
+        try {
+            const opponentEmoji = document.getElementById('opponent-emoji   ');
+            const opponentResult = document.getElementById('opponent-result');
+            
+            if (opponentEmoji && opponentResult) {
+                opponentEmoji.textContent = emoji;
+                opponentResult.textContent = element;
+            } else {
+                console.error('Opponent elements not found in DOM');
+            }
+        } catch (error) {
+            console.error('Error updating opponent:', error);
+        }
     }
 
 // Start polling for opponent updates
@@ -114,8 +122,8 @@ function startBattle(name, emoji) {
     })
     .then(response => response.json())
     .then(data => {
-        showBattleResult(data.winner, data.reason);
-        updateOpponent(data.playerElement.name, data.playerElement.emoji); // Update opponent for next round
+        showBattleResult(data.playerElement.name, data.reason);
+        updateOpponent(data.playerElement.name, data.playerElement.emoji);
     })
     .catch(error => {
         console.error('Battle Error:', error);
