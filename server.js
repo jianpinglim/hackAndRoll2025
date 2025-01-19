@@ -46,6 +46,7 @@ app.post('/api/combinations/combine',
                 next() // No match found
             }
     },
+
     async (req, res, next) => {
          const element1 = res.locals.element1;
          const element2 = res.locals.element2;
@@ -119,6 +120,7 @@ app.post('/api/combinations/combine',
             });
         }
     }, 
+
     async (req, res, next) => {
         console.log("I am at 3rd stage")
         const { element1, element2, result, emoji } = res.locals;
@@ -150,26 +152,12 @@ app.post('/api/combinations/combine',
     }
 );
 
-app.post('/api/battle', async (req, res, next) => {
-    
-        try {
-            const { rows } = await pool.query(
-            'SELECT result, emoji FROM word_cache ORDER BY RANDOM() LIMIT 1'
-            )
-            res.locals.opponent = rows[0]
-            console.log(res.locals.opponent.result)        
-            next()
-        } catch (err) {
-            console.error('Error getting random row:', err)
-            throw err
-        }
+app.post('/api/battle', 
+async (req, res) => {
+    const { playerElement, opponentElement, mode } = req.body;
 
-}, async (req, res) => {
-    const { playerElement, mode } = req.body;
-    const  opponentElement = res.locals.opponent.result;
-    console.log(res.locals.opponent.result)
 
-    
+
     const prompts = {
         funny: "You are a funny battle commentator. Generate a humorous battle result with silly puns and jokes. Keep it light and family-friendly.",
         brainrot: "You are a chaotic battle commentator. Generate absolutely nonsensical battle results with random internet memes and absurd logic and brainrot.",
@@ -195,8 +183,10 @@ app.post('/api/battle', async (req, res, next) => {
         
         res.json({
             winner: winner.trim(),
-            reason: reasonParts.join(':').trim()
+            reason: reasonParts.join(':').trim(),
+            playerElement: playerElement
         });
+
     } catch (error) {
         console.error('Battle API Error:', error);
         res.status(500).json({ error: 'Battle calculation failed' });
@@ -208,10 +198,6 @@ app.use(express.static('public'));
 
 // Game state
 const rooms = new Map();
-
-
-
-
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);

@@ -23,7 +23,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const savedElements = JSON.parse(localStorage.getItem('craftedElements')) || [];
         savedElements.forEach(({ name, emoji }) => {
             const element = createElementDiv(name, emoji);
-            element.addEventListener('click', () => selectElement(name, emoji));
+            element.addEventListener('click', () => {selectElement(name, emoji);
+                updateOpponent(name, emoji);
+             }
+        );
             savedElementsContainer.appendChild(element);
         });
     }
@@ -65,41 +68,60 @@ document.addEventListener('DOMContentLoaded', () => {
             resetModeButtons();
         }, 2000);
     }
-
-    function startBattle(playerChoice) {
-        // if (!selectedMode) {
-        //     alert('Please select a battle mode first!');
-        //     return;
-        // }
-
-        try {
-            const vsElement = document.querySelector('.vs');
-            vsElement.classList.add('hidden');
     
-            fetch('/api/battle', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    playerElement: playerChoice,
-                    opponentElement: 'Stone',
-                    mode: selectedMode
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                showBattleResult(data.winner, data.reason);
-            })
-            .catch(error => {
-                console.error('Battle Error:', error);
-                showBattleResult('Stone', 'Connection error, Stone wins by default!');
-            });
+    function updateOpponent(element, emoji) {
+        const opponentEmoji = document.getElementById('opponent-emoji');
+        const opponentResult = document.getElementById('opponent-result');
     
-        } catch (error) {
-            console.error('Battle Error:', error);
-        }
+        opponentEmoji.textContent = emoji;
+        opponentResult.textContent = element;
     }
+
+// Start polling for opponent updates
+const pollInterval = setInterval(updateOpponent, 2000); // Updates every 2 seconds
+
+// Initial update
+updateOpponent();
+
+// Clean up when page is closed/changed
+window.addEventListener('beforeunload', () => {
+    clearInterval(pollInterval);
+});
+
+
+// Clean up when page is closed/changed
+window.addEventListener('beforeunload', () => {
+    clearInterval(pollInterval);
+});
+
+
+function startBattle(name, emoji) {
+    const playerElement = document.querySelector('.player-element');
+    
+    if (!name) return;
+    
+    playerElement.innerHTML = `<div class="element">${emoji} ${name}</div>`;
+    
+    fetch('/api/battle', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            playerElement: { name, emoji },
+            mode: selectedMode,
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        showBattleResult(data.winner, data.reason);
+        updateOpponent(data.playerElement.name, data.playerElement.emoji); // Update opponent for next round
+    })
+    .catch(error => {
+        console.error('Battle Error:', error);
+        showBattleResult('Error', 'Battle failed to complete');
+    });
+}
 
     function resetModeButtons() {
         const modeButtons = document.querySelectorAll('.mode-btn');
@@ -122,3 +144,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadSavedElements();
 });
+
+// Optional: Stop polling when leaving the page
+window.addEventListener('beforeunload', () => {
+    clearInterval(pollInterval);
+})
